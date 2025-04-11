@@ -18,7 +18,7 @@ pub enum MainButton<'a> {
     /// # use mac_notification_sys::*;
     /// let _ = MainButton::SingleAction("Action name");
     /// ```
-    SingleAction(&'a str),
+    SingleAction(String),
 
     /// Display a dropdown with the given title, with a list of actions with given names
     ///
@@ -81,25 +81,25 @@ impl<'a> Notification<'a> {
     }
 
     /// Set `title` field
-    pub fn title(&mut self, title: &'a str) -> &mut Self {
+    pub fn title(mut self, title: &'a str) -> Self {
         self.title = title;
         self
     }
 
     /// Set `subtitle` field
-    pub fn subtitle(&mut self, subtitle: &'a str) -> &mut Self {
+    pub fn subtitle(mut self, subtitle: &'a str) -> Self {
         self.subtitle = Some(subtitle);
         self
     }
 
     /// Set `subtitle` field
-    pub fn maybe_subtitle(&mut self, subtitle: Option<&'a str>) -> &mut Self {
+    pub fn maybe_subtitle(mut self, subtitle: Option<&'a str>) -> Self {
         self.subtitle = subtitle;
         self
     }
 
     /// Set `message` field
-    pub fn message(&mut self, message: &'a str) -> &mut Self {
+    pub fn message(mut self, message: &'a str) -> Self {
         self.message = message;
         self
     }
@@ -112,7 +112,7 @@ impl<'a> Notification<'a> {
     /// # use mac_notification_sys::*;
     /// let _ = Notification::new().main_button(MainButton::SingleAction("Main button"));
     /// ```
-    pub fn main_button(&mut self, main_button: MainButton<'a>) -> &mut Self {
+    pub fn main_button(mut self, main_button: MainButton<'a>) -> Self {
         self.main_button = Some(main_button);
         self
     }
@@ -125,7 +125,7 @@ impl<'a> Notification<'a> {
     /// # use mac_notification_sys::*;
     /// let _ = Notification::new().close_button("Close");
     /// ```
-    pub fn close_button(&mut self, close_button: &'a str) -> &mut Self {
+    pub fn close_button(mut self, close_button: &'a str) -> Self {
         self.close_button = Some(close_button);
         self
     }
@@ -140,7 +140,7 @@ impl<'a> Notification<'a> {
     /// # use mac_notification_sys::*;
     /// let _ = Notification::new().app_icon("/path/to/icon.icns");
     /// ```
-    pub fn app_icon(&mut self, app_icon: &'a str) -> &mut Self {
+    pub fn app_icon(mut self, app_icon: &'a str) -> Self {
         self.app_icon = Some(app_icon);
         self
     }
@@ -153,7 +153,7 @@ impl<'a> Notification<'a> {
     /// # use mac_notification_sys::*;
     /// let _ = Notification::new().content_image("/path/to/image.png");
     /// ```
-    pub fn content_image(&mut self, content_image: &'a str) -> &mut Self {
+    pub fn content_image(mut self, content_image: &'a str) -> Self {
         self.content_image = Some(content_image);
         self
     }
@@ -167,7 +167,7 @@ impl<'a> Notification<'a> {
     /// let stamp = time::OffsetDateTime::now_utc().unix_timestamp() as f64 + 5.;
     /// let _ = Notification::new().delivery_date(stamp);
     /// ```
-    pub fn delivery_date(&mut self, delivery_date: f64) -> &mut Self {
+    pub fn delivery_date(mut self, delivery_date: f64) -> Self {
         self.delivery_date = Some(delivery_date);
         self
     }
@@ -179,7 +179,7 @@ impl<'a> Notification<'a> {
     /// # use mac_notification_sys::*;
     /// let _ = Notification::new().default_sound();
     /// ```
-    pub fn default_sound(&mut self) -> &mut Self {
+    pub fn default_sound(mut self) -> Self {
         self.sound = Some(Sound::Default);
         self
     }
@@ -191,7 +191,7 @@ impl<'a> Notification<'a> {
     /// # use mac_notification_sys::*;
     /// let _ = Notification::new().sound("Blow");
     /// ```
-    pub fn sound<S>(&mut self, sound: S) -> &mut Self
+    pub fn sound<S>(mut self, sound: S) -> Self
     where
         S: Into<Sound>,
     {
@@ -207,7 +207,7 @@ impl<'a> Notification<'a> {
     /// # use mac_notification_sys::*;
     /// let _ = Notification::new().sound("Blow");
     /// ```
-    pub fn maybe_sound<S>(&mut self, sound: Option<S>) -> &mut Self
+    pub fn maybe_sound<S>(mut self, sound: Option<S>) -> Self
     where
         S: Into<Sound>,
     {
@@ -225,7 +225,7 @@ impl<'a> Notification<'a> {
     /// # use mac_notification_sys::*;
     /// let _ = Notification::new().asynchronous(true);
     /// ```
-    pub fn asynchronous(&mut self, asynchronous: bool) -> &mut Self {
+    pub fn asynchronous(mut self, asynchronous: bool) -> Self {
         self.asynchronous = Some(asynchronous);
         self
     }
@@ -247,7 +247,9 @@ impl<'a> Notification<'a> {
         let (main_button_label, actions, is_response): (&str, &[&str], bool) =
             match &self.main_button {
                 Some(main_button) => match main_button {
-                    MainButton::SingleAction(main_button_label) => (main_button_label, &[], false),
+                    MainButton::SingleAction(main_button_label) => {
+                        (main_button_label.as_str(), &[], false)
+                    }
                     MainButton::DropdownActions(main_button_label, actions) => {
                         (main_button_label, actions, false)
                     }
